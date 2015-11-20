@@ -3,7 +3,7 @@ Easily view all your contributor commit statistics to your organisation's projec
 
 # Dependencies
 
-This project requires composer to install dependencies such as knplabs/github-api. You can find some instructions to install composer [here](https://getcomposer.org/doc/00-intro.md)
+This project requires composer to install dependencies such as [knplabs/github-api](https://github.com/KnpLabs/php-github-api). You can find some instructions to install composer [here](https://getcomposer.org/doc/00-intro.md)
 
 # Setup 
 
