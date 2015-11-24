@@ -71,6 +71,12 @@ echo "......................................................\n";
 foreach($repos AS $repo) {
 
 	$repo_authors = $client->api('repo')->statistics(ORGANISATION, $repo['name']);
+	
+	// $organizationApi = $client->api('repositories');
+	// $paginator       = new \Github\ResultPager($client);
+	// $parameters      = array(ORGANISATION, $repo['name']);
+	// $repo_authors    = $paginator->fetchAll($organizationApi, 'statistics', $parameters);
+	// Test query - SELECT datetime(week,'unixepoch'), * FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE login='cmorillo' ORDER BY week ASC;
 
 	echo "******* ".$repo['name'] ."[".count($repo_authors)." authors] *******\n";
 
@@ -98,12 +104,16 @@ foreach($repos AS $repo) {
 		if (!$query) {
 			die(print_r($db->errorInfo()) );
 		}
+	
+		// if ($author_data['author']['id'] == '871106') { print_r($author_data); exit(); }
+	
 		// Insert weekly commit information
 		foreach ($author_data['weeks'] AS $weekly_commits)  {
 			
-			// print_r($weekly_commits); exit();	
-			if ($weekly_commits['c'] > 0) {
+			// if ($author_data['author']['id'] == '871106') echo $weekly_commits['w'] . " - a:" . $weekly_commits['a']. " - d:" . $weekly_commits['d']. " - c:" . $weekly_commits['c']."\n";
 			
+			if ($weekly_commits['c'] > 0) {
+							
 				$stmt = $db->prepare('INSERT OR IGNORE INTO weekly_commits 
 					(repo_id, 
 					author_id, 
