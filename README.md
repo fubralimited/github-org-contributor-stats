@@ -30,9 +30,20 @@ cp config.php.example config.php
 vim config.php
 ```
 
-# Running the script
+Install ansible role requirements
+```
+sudo ansible-galaxy install -r requirements.yml
+```
+
+
+# Running the import script
 
 Import your repository commit data into the local SQLite database
 ```
 php -f import.php
 ```
+
+# Author Information
+
+Paul Maunders
+Jeff Geerling - [Ansible LEMP code](https://github.com/geerlingguy/ansible-vagrant-examples/tree/master/lemp)
