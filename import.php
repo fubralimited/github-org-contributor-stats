@@ -29,7 +29,15 @@ echo "......................................................\n";
 echo "Fetching repositories.................................\n";
 echo "......................................................\n";
 
-$repos = $client->api('repo')->org(ORGANISATION);
+// Relevant documentation:
+// https://developer.github.com/v3/repos/#list-organization-repositories
+// https://github.com/KnpLabs/php-github-api/blob/master/lib/Github/Api/Repo.php
+// https://github.com/KnpLabs/php-github-api/blob/master/doc/result_pager.md
+
+$organizationApi = $client->api('organization');
+$paginator  = new \Github\ResultPager($client);
+$parameters = array(ORGANISATION);
+$repos      = $paginator->fetchAll($organizationApi, 'repositories', $parameters);
 
 // Insert repos
 
