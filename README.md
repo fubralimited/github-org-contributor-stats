@@ -44,7 +44,7 @@ cd http
 php -S localhost:8000
 ```
 
-You should then be able to access the web interface through http://localhost:8000
+You should then be able to access the web interface through [http://localhost:8000](http://localhost:8000)
 
 # Vagrant & Ansible
 
