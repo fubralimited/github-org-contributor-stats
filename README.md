@@ -40,7 +40,7 @@ sudo ansible-galaxy install -r requirements.yml
 
 Import your repository commit data into the local SQLite database
 ```
-php -f import.php
+php -f src/import.php
 ```
 
 # Author Information
