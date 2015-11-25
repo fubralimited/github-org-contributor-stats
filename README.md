@@ -45,5 +45,5 @@ php -f src/import.php
 
 # Author Information
 
-Paul Maunders
-Jeff Geerling - [Ansible LEMP code](https://github.com/geerlingguy/ansible-vagrant-examples/tree/master/lemp)
+* Paul Maunders (Fubra Limited)
+* Jeff Geerling - [Ansible LEMP code](https://github.com/geerlingguy/ansible-vagrant-examples/tree/master/lemp)
