@@ -32,12 +32,23 @@ vim config.php
 
 # Running the import script
 
-Import your repository commit data into the local SQLite database
+Import your repository commit data into the local SQLite database by running the import script from your command line:
 ```
 php -f src/import.php
 ```
 
+# Viewing the web interface
+You can access the web interface through PHP's built in web-server, or using the Vagrant box (see below). To use PHP's webserver run the following command from your command line:
+```
+cd http
+php -S localhost:8000
+```
+
+You should then be able to access the web interface through http://localhost:8000
+
 # Vagrant & Ansible
+
+If you can't use PHP's built in webserver, or you wish to test the scripts in a full LEMP environment, then you could use our Vagrant / Ansible scripts to deploy a development virtual machine (Vagrant box).
 
 This project includes a VagrantFile and Ansible configuration to set up a local LEMP (Linux, NGINX, MySQL, PHP) test environment from which you can run the scripts. To use this, you will need [VirtualBox](https://www.virtualbox.org/wiki/Downloads), [Vagrant](https://www.vagrantup.com/downloads.html) and [Ansible](http://docs.ansible.com/ansible/intro_installation.html) installed.
 
