@@ -1,6 +1,6 @@
 <?php
 
-require_once 'config.php';
+require_once 'includes.php';
 
 // Delete existing database if REFRESH_DATABASE set
 if (is_file(SQLLITE_DB_FILENAME) && REFRESH_DATABASE) {
