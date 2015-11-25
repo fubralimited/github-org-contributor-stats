@@ -1,8 +1,6 @@
 <?php
 
 require_once 'config.php';
-require_once 'functions.php';
-require_once 'vendor/autoload.php';
 
 // Delete existing database if REFRESH_DATABASE set
 if (is_file(SQLLITE_DB_FILENAME) && REFRESH_DATABASE) {
