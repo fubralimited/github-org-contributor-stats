@@ -43,6 +43,16 @@ Import your repository commit data into the local SQLite database
 php -f src/import.php
 ```
 
+# Vagrant & Ansible
+
+This project includes a VagrantFile and ansible configuration to set up a local LEMP (Linux, NGINX, MySQL, PHP) test environment from which you can run the scripts. To use this, you will need [VirtualBox](https://www.virtualbox.org/wiki/Downloads), [Vagrant](https://www.vagrantup.com/downloads.html) and [Ansible](http://docs.ansible.com/ansible/intro_installation.html) installed, then do.
+
+```
+vagrant up
+```
+
+You should then be able to access the site via your browser on http://192.168.33.34
+
 # Author Information
 
 * Paul Maunders (Fubra Limited)
