@@ -23,3 +23,17 @@ mysql_root_password: root
 mysql_enablerepo: remi
 
 nginx_worker_connections: 1024
+
+nginx_vhosts:
+  - listen: "80 default_server"
+    server_name: "github-org-contributor-stats"
+    root: "/sites/github-org-contributor-stats/http"
+    index: "index.php index.html index.htm"
+    extra_parameters: |
+      location ~ \.php$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+      }

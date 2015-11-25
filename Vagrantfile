@@ -21,6 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :lemp do |lemp|
   end
 
+  config.vm.synced_folder ".", "/sites/github-org-contributor-stats"
+
   # Ansible provisioner.
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "provisioning/playbook.yml"
