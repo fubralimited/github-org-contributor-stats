@@ -13,7 +13,7 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Github Organisation Contributor Statistics</title>
+    <title>Contributor Statistics</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/components/bootstrap/css/bootstrap.min.css">
@@ -37,57 +37,139 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
     <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
     <script type="text/javascript" src="/components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
     
+   <style type="text/css">
+		@media screen and (min-width: 768px) {
+		    #adv-search {
+		        width: 500px;
+		        margin: 0 auto;
+		    }
+		}
+	</style>
+    
   </head>
   <body>
-    <h1>Github Organisation Contributor Statistics</h1>
-    
-    
+	  
 	<div class="container">
-	    <div class="row">
-	        <div class='col-sm-6'>
-	            <div class="form-group">
-	                <div class='input-group date' id='datetimepicker1'>
-	                    <input type='text' class="form-control" />
-	                    <span class="input-group-addon">
-	                        <span class="glyphicon glyphicon-calendar"></span>
-	                    </span>
-	                </div>
-	            </div>
-	        </div>
-	        <script type="text/javascript">
-	            $(function () {
-	                $('#datetimepicker1').datetimepicker({
-		                format: 'DD/MM/YYYY'
-	                });
-	                	
-	            });
-	        </script>
-	    </div>
-	</div>
+	   
+		<!-- Main jumbotron for a primary marketing message or call to action -->
+		<div class="jumbotron">
+			<h1>Contributor Statistics</h1>
+			<p>A tool to display all Github contributor statistics for <? echo ( defined('ORGANISATION') ? ORGANISATION : ' an organisation');?>.</p>
+		</div>	 
+ 
+ 		<div class="page-header">
+			<h2>Search by user</h2>
+		</div>
+    
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+		            <div class="input-group" id="adv-search">
+		                <input type="text" class="form-control" placeholder="Enter a github username" />
+		                <div class="input-group-btn">
+		                    <div class="btn-group" role="group">
+		                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+		                    </div>
+		                </div>
+		            </div>
+				</div>
+			</div>
+		</div>
 
-<div class="container">
-    <div class="row">
-        <div class='col-sm-6'>
-            <div class="form-group">
-                <div class='input-group date' id='datetimepicker3'>
-                    <input type='text' class="form-control" />
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-time"></span>
-                    </span>
-                </div>
-            </div>
+		
+		
+     	<div class="page-header">
+			<h2>Search by date</h2>
+		</div>
+    
+    
+		<div class="container">
+		    <div class="row">
+		        <div class='col-sm-6'>
+		            <div class="form-group">
+			            From: 
+		                <div class='input-group date' id='datetimepicker1'>
+		                    <input type='text' class="form-control" />
+		                    <span class="input-group-addon">
+		                        <span class="glyphicon glyphicon-calendar"></span>
+		                    </span>
+		                </div>
+		            </div>
+		        </div>
+		        <script type="text/javascript">
+		            $(function () {
+		                $('#datetimepicker1').datetimepicker({
+			                format: 'DD/MM/YYYY'
+		                });
+		                	
+		            });
+		        </script>
+		    </div>
+		</div>
+
+		<div class="container">
+		    <div class="row">
+		        <div class='col-sm-6'>
+		            <div class="form-group">
+		                <div class='input-group date' id='datetimepicker3'>
+		                    <input type='text' class="form-control" />
+		                    <span class="input-group-addon">
+		                        <span class="glyphicon glyphicon-time"></span>
+		                    </span>
+		                </div>
+		            </div>
+		        </div>
+		        <script type="text/javascript">
+		            $(function () {
+		                $('#datetimepicker3').datetimepicker({
+		                    format: 'LT'
+		                });
+		            });
+		        </script>
+		    </div>
+		</div>
+
+		<div class="page-header">
+			<h2>Results</h2>
+		</div>
+		
+		
+		<div class="col-md-6">
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Username</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Mark</td>
+                <td>Otto</td>
+                <td>@mdo</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Jacob</td>
+                <td>Thornton</td>
+                <td>@fat</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td colspan="2">Larry the Bird</td>
+                <td>@twitter</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <script type="text/javascript">
-            $(function () {
-                $('#datetimepicker3').datetimepicker({
-                    format: 'LT'
-                });
-            });
-        </script>
-    </div>
-</div>
 
-   
+
+
+
+	</div>
     
     
   </body>
