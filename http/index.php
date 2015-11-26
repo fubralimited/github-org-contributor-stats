@@ -16,10 +16,10 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
     <title>Github Organisation Contributor Statistics</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/components/bootstrap/css/bootstrap.min.css">
     
     <!-- DateTimePicker-->
-    <link rel="stylesheet" href="/css/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" href="/components/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -29,13 +29,13 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
     <![endif]-->
     
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="/js/jquery.min.js"></script>
+    <script src="/components/jquery/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/js/bootstrap.min.js"></script>
+    <script src="/components/bootstrap/js/bootstrap.min.js"></script>
     
     <!-- DataTimePicker http://eonasdan.github.io/bootstrap-datetimepicker/Installing/ -->
-    <script type="text/javascript" src="/js/moment.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="/components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
     
   </head>
   <body>
