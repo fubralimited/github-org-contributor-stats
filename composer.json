@@ -1,5 +1,7 @@
 {
     "require": {
-        "knplabs/github-api": "~1.4"
+        "knplabs/github-api": "~1.4",
+        "eonasdan/bootstrap-datetimepicker": "^4.17",
+        "twbs/bootstrap": "^3.3"
     }
 }
