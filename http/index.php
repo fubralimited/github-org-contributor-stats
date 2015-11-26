@@ -43,7 +43,10 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 		        width: 500px;
 		        margin: 0 auto;
 		    }
+
 		}
+		
+		
 	</style>
     
   </head>
@@ -61,20 +64,22 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			<h2>Search by user</h2>
 		</div>
     
-		<div class="container">
-			<div class="row">
-				<div class="col-md-12">
-		            <div class="input-group" id="adv-search">
-		                <input type="text" class="form-control" placeholder="Enter a github username" />
-		                <div class="input-group-btn">
-		                    <div class="btn-group" role="group">
-		                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-		                    </div>
-		                </div>
-		            </div>
+		<form method="get" action="">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-12">
+			            <div class="input-group" id="adv-search">
+			                <input type="text" class="form-control" placeholder="Enter a github username" />
+			                <div class="input-group-btn">
+			                    <div class="btn-group" role="group">
+			                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+			                    </div>
+			                </div>
+			            </div>
+					</div>
 				</div>
 			</div>
-		</div>
+		</form>
 
 		
 		
@@ -82,52 +87,53 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			<h2>Search by date</h2>
 		</div>
     
-    
-		<div class="container">
-		    <div class="row">
-		        <div class='col-sm-6'>
-		            <div class="form-group">
-			            From: 
-		                <div class='input-group date' id='datetimepicker1'>
-		                    <input type='text' class="form-control" />
-		                    <span class="input-group-addon">
-		                        <span class="glyphicon glyphicon-calendar"></span>
-		                    </span>
-		                </div>
-		            </div>
-		        </div>
-		        <script type="text/javascript">
-		            $(function () {
-		                $('#datetimepicker1').datetimepicker({
-			                format: 'DD/MM/YYYY'
-		                });
-		                	
-		            });
-		        </script>
-		    </div>
-		</div>
-
-		<div class="container">
-		    <div class="row">
-		        <div class='col-sm-6'>
-		            <div class="form-group">
-		                <div class='input-group date' id='datetimepicker3'>
-		                    <input type='text' class="form-control" />
-		                    <span class="input-group-addon">
-		                        <span class="glyphicon glyphicon-time"></span>
-		                    </span>
-		                </div>
-		            </div>
-		        </div>
-		        <script type="text/javascript">
-		            $(function () {
-		                $('#datetimepicker3').datetimepicker({
-		                    format: 'LT'
-		                });
-		            });
-		        </script>
-		    </div>
-		</div>
+		<form method="get" action="">
+		    <div class="container">
+			    <div class='col-md-4'>
+			        <div class="form-group">
+			            <div class='input-group date' id='datetimepicker6'>
+			                <input type='text' class="form-control" name="date_from" placeholder="From:" />
+			                <span class="input-group-addon">
+			                    <span class="glyphicon glyphicon-calendar"></span>
+			                </span>
+			            </div>
+			        </div>
+			    </div>
+			    <div class='col-md-4'>
+			        <div class="form-group">
+			            <div class='input-group date' id='datetimepicker7'>
+			                <input type='text' class="form-control" name="date_from" placeholder="To:" />
+			                <span class="input-group-addon">
+			                    <span class="glyphicon glyphicon-calendar"></span>
+			                </span>
+			            </div>
+			        </div>
+			    </div>
+			    <div class='col-md-4'>
+			        <div class="form-group">
+				        <div class='input-group' id='datebutton'>
+							<button type="submit" class="btn btn-default">Submit</button>
+				        </div>
+			        </div>
+			    </div>
+			</div>
+			<script type="text/javascript">
+			    $(function () {
+			        $('#datetimepicker6').datetimepicker();
+			        $('#datetimepicker7').datetimepicker({
+			            useCurrent: false //Important! See issue #1075
+			        });
+			        $("#datetimepicker6").on("dp.change", function (e) {
+			            $('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+			        });
+			        $("#datetimepicker7").on("dp.change", function (e) {
+			            $('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+			        });
+			    });
+			</script>
+   
+		
+		</form>
 
 		<div class="page-header">
 			<h2>Results</h2>
