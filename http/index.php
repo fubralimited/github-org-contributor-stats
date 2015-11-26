@@ -5,6 +5,67 @@ require_once '../src/includes.php';
 // Connect to database, or create it if it doesn't exist
 $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 
+/*
+if (isset($_GET['date_from']) {
+	$where['date_from'] = 	
+}
+*/
+
+// Get Weekly Commits
+
+$sql = 'SELECT author_id, repo_id, week, additions, deletions, commits FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE 1 ORDER BY week ASC';
+$stmt = $db->prepare($sql);
+$query = $stmt->execute(array());
+if (!$query) {
+	die(print_r($db->errorInfo()) );
+}
+
+while ($row = $stmt->fetch()) {
+	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['additions'] = $row ['additions'];
+	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['deletions'] = $row ['deletions'];
+	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['commits'] = $row ['commits'];
+	$weeks[$row['week']] = $row['week'];
+}
+
+asort($weeks);
+
+// Get Author Info
+
+$sql = 'SELECT * FROM authors WHERE 1';
+$stmt = $db->prepare($sql);
+$query = $stmt->execute(array());
+if (!$query) {
+	die(print_r($db->errorInfo()) );
+}
+
+while ($row = $stmt->fetch()) {
+	$authors[$row['id']] = $row;
+}
+
+// Get Repo Info
+
+$sql = 'SELECT * FROM repos WHERE 1';
+$stmt = $db->prepare($sql);
+$query = $stmt->execute(array());
+if (!$query) {
+	die(print_r($db->errorInfo()) );
+}
+
+while ($row = $stmt->fetch()) {
+	$repos[$row['id']] = $row;
+}
+
+/*
+echo '<pre>';
+print_r($authors);
+echo '</pre>';
+*/
+
+// SELECT datetime(week,'unixepoch'), * FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE 1 ORDER BY week ASC;
+// SELECT *, SUM(wc.commits) FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id GROUP BY r.id, a.id ORDER BY a.id ASC;
+// SELECT *, SUM(wc.commits) FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE a.id=245434 GROUP BY r.id ORDER BY a.id ASC
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,18 +98,6 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
     <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
     <script type="text/javascript" src="/components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
     
-   <style type="text/css">
-		@media screen and (min-width: 768px) {
-		    #adv-search {
-		        width: 500px;
-		        margin: 0 auto;
-		    }
-
-		}
-		
-		
-	</style>
-    
   </head>
   <body>
 	  
@@ -59,30 +108,7 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			<h1>Contributor Statistics</h1>
 			<p>A tool to display all Github contributor statistics for <? echo ( defined('ORGANISATION') ? ORGANISATION : ' an organisation');?>.</p>
 		</div>	 
- 
- 		<div class="page-header">
-			<h2>Search by user</h2>
-		</div>
-    
-		<form method="get" action="">
-			<div class="container">
-				<div class="row">
-					<div class="col-md-12">
-			            <div class="input-group" id="adv-search">
-			                <input type="text" class="form-control" placeholder="Enter a github username" />
-			                <div class="input-group-btn">
-			                    <div class="btn-group" role="group">
-			                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-			                    </div>
-			                </div>
-			            </div>
-					</div>
-				</div>
-			</div>
-		</form>
-
-		
-		
+ 	
      	<div class="page-header">
 			<h2>Search by date</h2>
 		</div>
@@ -92,7 +118,7 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			    <div class='col-md-4'>
 			        <div class="form-group">
 			            <div class='input-group date' id='datetimepicker6'>
-			                <input type='text' class="form-control" name="date_from" placeholder="From:" />
+			                <input type='text' class="form-control" name="date_from" placeholder="From:" value="<? echo ( isset($_GET['date_from']) ? $_GET['date_from'] : '');?>" />
 			                <span class="input-group-addon">
 			                    <span class="glyphicon glyphicon-calendar"></span>
 			                </span>
@@ -102,7 +128,7 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			    <div class='col-md-4'>
 			        <div class="form-group">
 			            <div class='input-group date' id='datetimepicker7'>
-			                <input type='text' class="form-control" name="date_from" placeholder="To:" />
+			                <input type='text' class="form-control" name="date_to" placeholder="To:" value="<? echo ( isset($_GET['date_to']) ? $_GET['date_to'] : '');?>" />
 			                <span class="input-group-addon">
 			                    <span class="glyphicon glyphicon-calendar"></span>
 			                </span>
@@ -119,8 +145,11 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			</div>
 			<script type="text/javascript">
 			    $(function () {
-			        $('#datetimepicker6').datetimepicker();
+			        $('#datetimepicker6').datetimepicker({
+				        format: "DD/MM/YYYY"
+			        });
 			        $('#datetimepicker7').datetimepicker({
+			            format: "DD/MM/YYYY",
 			            useCurrent: false //Important! See issue #1075
 			        });
 			        $("#datetimepicker6").on("dp.change", function (e) {
@@ -139,11 +168,46 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 			<h2>Results</h2>
 		</div>
 		
+		<table class="table table-condensed">
+     	<thead>
+        <tr>
+          <th>User</th>
+          <th>Repository</th><?
+            foreach ($weeks AS $week_id => $week) {
+              $i++;
+              echo "          <th>".$i."</th>\n";
+            }
+          ?>
+        </tr>
+      </thead>
+      <tbody><?
+			foreach ($authors AS $author_id => $author) { 
+				foreach ($repos AS $repo_id => $repo) { 
+					if (isset($commits_map[$author_id][$repo_id])) { 				
+						echo "\n";
+						echo "        <tr>\n";
+						echo "          <td>".$author['login'] ."</td>\n";
+						echo "          <td>".$repo['name'] ."</td>\n";			
+            foreach ($weeks AS $week_id => $week) {
+              if (isset($commits_map[$author_id][$repo_id][$week_id])) {
+                
+                echo "          <td>".$commits_map[$author_id][$repo_id][$week_id]['commits']."</td>\n";
+							} else {
+  							echo "          <td>&nbsp;</td>\n";
+							}
+						} 
+						echo "        </tr>";
+					} 
+				}
+			} ?>
+			</tbody>
+		</table>
+		
 		
 		<div class="col-md-6">
           <table class="table table-condensed">
-            <thead>
-              <tr>
+           	<thead>
+             	<tr>
                 <th>#</th>
                 <th>First Name</th>
                 <th>Last Name</th>
