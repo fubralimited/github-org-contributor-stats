@@ -27,10 +27,7 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  <body>
-    <h1>Github Organisation Contributor Statistics</h1>
-
+    
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="/js/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -39,6 +36,57 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
     <!-- DataTimePicker http://eonasdan.github.io/bootstrap-datetimepicker/Installing/ -->
     <script type="text/javascript" src="/js/moment.min.js"></script>
     <script type="text/javascript" src="/js/bootstrap-datetimepicker.min.js"></script>
+    
+  </head>
+  <body>
+    <h1>Github Organisation Contributor Statistics</h1>
+    
+    
+	<div class="container">
+	    <div class="row">
+	        <div class='col-sm-6'>
+	            <div class="form-group">
+	                <div class='input-group date' id='datetimepicker1'>
+	                    <input type='text' class="form-control" />
+	                    <span class="input-group-addon">
+	                        <span class="glyphicon glyphicon-calendar"></span>
+	                    </span>
+	                </div>
+	            </div>
+	        </div>
+	        <script type="text/javascript">
+	            $(function () {
+	                $('#datetimepicker1').datetimepicker({
+		                format: 'DD/MM/YYYY'
+	                });
+	                	
+	            });
+	        </script>
+	    </div>
+	</div>
+
+<div class="container">
+    <div class="row">
+        <div class='col-sm-6'>
+            <div class="form-group">
+                <div class='input-group date' id='datetimepicker3'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-time"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(function () {
+                $('#datetimepicker3').datetimepicker({
+                    format: 'LT'
+                });
+            });
+        </script>
+    </div>
+</div>
+
    
     
     
