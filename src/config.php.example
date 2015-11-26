@@ -3,7 +3,7 @@
 // Constants
 
 date_default_timezone_set("Europe/London");
-define ('SQLLITE_DB_FILENAME', './github-stats.sqlite');
+define ('SQLLITE_DB_FILENAME', dirname(__FILE__).'/../github-stats.sqlite');
 define ('REFRESH_DATABASE', true);
 define ('GITHUB_PERSONAL_ACCESS_TOKEN_USER', 'example-username'); 
 define ('GITHUB_PERSONAL_ACCESS_TOKEN_PASSWORD', 'example-token-1a1a1a1a1a1a1a1a1a1a1a1a'); 
