@@ -5,29 +5,22 @@ require_once '../src/includes.php';
 // Connect to database, or create it if it doesn't exist
 $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 
-/*
-if (isset($_GET['date_from']) {
-	$where['date_from'] = 	
-}
-*/
+// Default date ranges
 
-// Get Weekly Commits
-
-$sql = 'SELECT author_id, repo_id, week, additions, deletions, commits FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE 1 ORDER BY week ASC';
-$stmt = $db->prepare($sql);
-$query = $stmt->execute(array());
-if (!$query) {
-	die(print_r($db->errorInfo()) );
+if (!isset($_GET['date_from'])) {
+  $_GET['date_from'] = '01-10-2014';
 }
 
-while ($row = $stmt->fetch()) {
-	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['additions'] = $row ['additions'];
-	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['deletions'] = $row ['deletions'];
-	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['commits'] = $row ['commits'];
-	$weeks[$row['week']] = $row['week'];
+if (!isset($_GET['date_to'])) {
+  $_GET['date_to'] = '30-09-2015';
 }
 
-asort($weeks);
+$report_types = array (
+  'commits_by_week' => 'By Week',
+  'commits_by_project' => 'By Project',
+  'commits_by_author' => 'By Author'
+);
+
 
 // Get Author Info
 
@@ -39,7 +32,7 @@ if (!$query) {
 }
 
 while ($row = $stmt->fetch()) {
-	$authors[$row['id']] = $row;
+	$authors[$row['id']]['row'] = $row;
 }
 
 // Get Repo Info
@@ -55,11 +48,45 @@ while ($row = $stmt->fetch()) {
 	$repos[$row['id']] = $row;
 }
 
+if (isset($_GET['report_type'])) {
+  
+  // Get Weekly Commits
+  
+  $sql = 'SELECT author_id, repo_id, week, additions, deletions, commits FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE week >= ? AND week <= ? ORDER BY week ASC';
+  // $debug_sql = 'SELECT author_id, repo_id, week, additions, deletions, commits FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE week >= '.strtotime($_GET['date_from']).' AND week <= '.strtotime($_GET['date_to']).' ORDER BY week ASC';
+  // echo $debug_sql;
+  $stmt = $db->prepare($sql);
+  $query = $stmt->execute(array(strtotime($_GET['date_from']),strtotime($_GET['date_to'])));
+  if (!$query) {
+  	die(print_r($db->errorInfo()) );
+  }
+  
+  // echo $stmt->debugDumpParams();
+  
+  while ($row = $stmt->fetch()) {
+  	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['additions'] = $row ['additions'];
+  	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['deletions'] = $row ['deletions'];
+  	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['commits'] = $row ['commits'];
+  	$weeks[$row['week']] = $row['week'];
+  	$authors[$row['author_id']]['total_commits'] += $row ['commits'];
+  }
+  
+  asort($weeks);
+  
+  foreach ($authors AS $author_id => $author) {
+    $total_commits[$author_id] = $author['total_commits'];
+  }
+  
+  arsort($total_commits);
+  
+}
+
 /*
 echo '<pre>';
 print_r($authors);
 echo '</pre>';
 */
+
 
 // SELECT datetime(week,'unixepoch'), * FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id WHERE 1 ORDER BY week ASC;
 // SELECT *, SUM(wc.commits) FROM weekly_commits AS wc INNER JOIN authors AS a ON wc.author_id = a.id INNER JOIN repos AS r ON wc.repo_id=r.id GROUP BY r.id, a.id ORDER BY a.id ASC;
@@ -98,6 +125,10 @@ echo '</pre>';
     <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
     <script type="text/javascript" src="/components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
     
+    <style type='text/css'>
+        .container { margin-left: 10px; }
+    </style>
+    
   </head>
   <body>
 	  
@@ -115,7 +146,7 @@ echo '</pre>';
     
 		<form method="get" action="">
 		    <div class="container">
-			    <div class='col-md-4'>
+			    <div class='col-md-3'>
 			        <div class="form-group">
 			            <div class='input-group date' id='datetimepicker6'>
 			                <input type='text' class="form-control" name="date_from" placeholder="From:" value="<? echo ( isset($_GET['date_from']) ? $_GET['date_from'] : '');?>" />
@@ -125,7 +156,7 @@ echo '</pre>';
 			            </div>
 			        </div>
 			    </div>
-			    <div class='col-md-4'>
+			    <div class='col-md-3'>
 			        <div class="form-group">
 			            <div class='input-group date' id='datetimepicker7'>
 			                <input type='text' class="form-control" name="date_to" placeholder="To:" value="<? echo ( isset($_GET['date_to']) ? $_GET['date_to'] : '');?>" />
@@ -135,10 +166,21 @@ echo '</pre>';
 			            </div>
 			        </div>
 			    </div>
-			    <div class='col-md-4'>
+			    <div class='col-md-3'>
+			        <div class="form-group">
+				        <div class='input-group' id='reporttypedropdown'>
+                  <select class="form-control" name="report_type">
+                    <? foreach ($report_types AS $report_key => $report_name) { ?> 
+                      <option value="<?= $report_key; ?>"<? echo ( isset($_GET['report_type']) && $_GET['report_type'] == $report_key ? ' selected' : ''); ?>><?= $report_name; ?></option>
+                    <? } ?>
+                  </select>
+				        </div>
+			        </div>
+			    </div>
+			   <div class='col-md-3'>
 			        <div class="form-group">
 				        <div class='input-group' id='datebutton'>
-							<button type="submit" class="btn btn-default">Submit</button>
+                  <button type="submit" class="btn btn-default" name="button" value="commits_by_week">Submit</button>
 				        </div>
 			        </div>
 			    </div>
@@ -146,10 +188,10 @@ echo '</pre>';
 			<script type="text/javascript">
 			    $(function () {
 			        $('#datetimepicker6').datetimepicker({
-				        format: "DD/MM/YYYY"
+				        format: "DD-MM-YYYY"
 			        });
 			        $('#datetimepicker7').datetimepicker({
-			            format: "DD/MM/YYYY",
+			            format: "DD-MM-YYYY",
 			            useCurrent: false //Important! See issue #1075
 			        });
 			        $("#datetimepicker6").on("dp.change", function (e) {
@@ -164,80 +206,77 @@ echo '</pre>';
 		
 		</form>
 
-		<div class="page-header">
-			<h2>Results</h2>
-		</div>
+<?  switch ($_GET['report_type']) {  
+      
+      case 'commits_by_week': ?>
+
+  		<div class="page-header">
+  			<h2>Commits by week</h2>
+  		</div>
+  		
+  		<table class="table table-condensed">
+       	<thead>
+          <tr>
+            <th>User</th>
+            <th>Repository</th><?
+              foreach ($weeks AS $week_id => $week) {
+                $i++;
+                echo "          <th>".$i."</th>\n";
+              }
+            ?>
+          </tr>
+        </thead>
+        <tbody><?
+  			foreach ($authors AS $author_id => $author) { 
+  				foreach ($repos AS $repo_id => $repo) { 
+  					if (isset($commits_map[$author_id][$repo_id])) { 				
+  						echo "\n";
+  						echo "        <tr>\n";
+  						echo "          <td>".$author['row']['login'] ."</td>\n";
+  						echo "          <td>".$repo['name'] ."</td>\n";			
+              foreach ($weeks AS $week_id => $week) {
+                if (isset($commits_map[$author_id][$repo_id][$week_id])) {
+                  
+                  echo "          <td>".$commits_map[$author_id][$repo_id][$week_id]['commits']."</td>\n";
+  							} else {
+    							echo "          <td>&nbsp;</td>\n";
+  							}
+  						} 
+  						echo "        </tr>";
+  					} 
+  				}
+  			} ?>
+  			</tbody>
+  		</table>
+  		
+<?    break; ?>		
+<?    case 'commits_by_author': ?>
 		
-		<table class="table table-condensed">
-     	<thead>
-        <tr>
-          <th>User</th>
-          <th>Repository</th><?
-            foreach ($weeks AS $week_id => $week) {
-              $i++;
-              echo "          <th>".$i."</th>\n";
-            }
-          ?>
-        </tr>
-      </thead>
-      <tbody><?
-			foreach ($authors AS $author_id => $author) { 
-				foreach ($repos AS $repo_id => $repo) { 
-					if (isset($commits_map[$author_id][$repo_id])) { 				
-						echo "\n";
-						echo "        <tr>\n";
-						echo "          <td>".$author['login'] ."</td>\n";
-						echo "          <td>".$repo['name'] ."</td>\n";			
-            foreach ($weeks AS $week_id => $week) {
-              if (isset($commits_map[$author_id][$repo_id][$week_id])) {
-                
-                echo "          <td>".$commits_map[$author_id][$repo_id][$week_id]['commits']."</td>\n";
-							} else {
-  							echo "          <td>&nbsp;</td>\n";
-							}
-						} 
-						echo "        </tr>";
-					} 
-				}
-			} ?>
-			</tbody>
-		</table>
-		
-		
-		<div class="col-md-6">
+				<div class="col-md-6">
           <table class="table table-condensed">
            	<thead>
              	<tr>
                 <th>#</th>
-                <th>First Name</th>
-                <th>Last Name</th>
                 <th>Username</th>
+                <th>Commits</th>
               </tr>
             </thead>
             <tbody>
+            <? $i=0; ?>
+            <? foreach ($total_commits AS $author_id => $num_commits) { $i++; ?>
               <tr>
-                <td>1</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
+                <td><?= $i?></td>
+                <td><?= $authors[$author_id]['row']['login']?></td>
+                <td><?= $num_commits?></td>
               </tr>
-              <tr>
-                <td>2</td>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td colspan="2">Larry the Bird</td>
-                <td>@twitter</td>
-              </tr>
+            <? } ?>
             </tbody>
           </table>
         </div>
+		
+<?    break; ?>
 
-
-
+<? } ?>
 
 	</div>
     
