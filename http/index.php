@@ -77,6 +77,8 @@ if (isset($_GET['report_type'])) {
   	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['additions'] = $row ['additions'];
   	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['deletions'] = $row ['deletions'];
   	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['commits'] = $row ['commits'];
+  	
+  	$commits_author_repo [$row['author_id']] [$row['repo_id']] ['total_commits'] += $row ['commits'];
   	$weeks[$row['week']] = $row['week'];
   	$authors[$row['author_id']]['total_commits'] += $row ['commits'];
   }
@@ -84,12 +86,18 @@ if (isset($_GET['report_type'])) {
   asort($weeks);
   
   foreach ($authors AS $author_id => $author) {
-    $total_commits[$author_id] = $author['total_commits'];
+    if ($author['total_commits'] > 0) {
+      $total_commits[$author_id] = $author['total_commits'];
+    } else {
+      // Remove authors without any commits
+      unset($authors[$author_id]);
+    }
   }
   
   arsort($total_commits);
   
 }
+
 
 /*
 echo '<pre>';
@@ -267,7 +275,7 @@ echo '</pre>';
            	<thead>
              	<tr>
                 <th>#</th>
-                <th>Username</th>
+                <th>User</th>
                 <th>Commits</th>
               </tr>
             </thead>
@@ -278,6 +286,41 @@ echo '</pre>';
                 <td><?= $i?></td>
                 <td><?= $authors[$author_id]['row']['login']?></td>
                 <td><?= $num_commits?></td>
+              </tr>
+            <? } ?>
+            </tbody>
+          </table>
+        </div>
+		
+<?    break; ?>
+
+<?    case 'commits_by_project': ?>
+		
+				<div class="col-md-6">
+          <table class="table table-condensed">
+           	<thead>
+             	<tr>
+                <th>User</th>
+                <th>Project</th>
+             	</tr>
+                
+             	</tr>
+             	  <th>&nbsp;</th><?
+                foreach ($repos AS $repo_id => $repo) {
+                  $i++;
+                  echo "          <th>".$repo['name']."</th>\n";
+                }
+              ?>
+              </tr>
+            </thead>
+            <tbody>
+            <? $i=0; ?>
+            <? foreach ($authors AS $author_id => $author) { ?>
+              <tr>
+              <td><?= $authors[$author_id]['row']['login']?></td>
+              <?  foreach ($repos AS $repo_id => $repo) { ?>
+                <td><?= $commits_author_repo[$author_id][$repo_id]['total_commits'] ?></td>
+              <?  } ?> 
               </tr>
             <? } ?>
             </tbody>
