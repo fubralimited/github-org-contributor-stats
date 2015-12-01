@@ -7,12 +7,22 @@ $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 
 // Default date ranges
 
+$time = time();
+
 if (!isset($_GET['date_from'])) {
-  $_GET['date_from'] = '01-10-2014';
+  if (date('m', $time) >= 10) {
+    $_GET['date_from'] = '01-10-'.(date('Y', $time)-1);
+  } else {
+    $_GET['date_from'] = '01-10-'.(date('Y', $time)-2);
+  }
 }
 
 if (!isset($_GET['date_to'])) {
-  $_GET['date_to'] = '30-09-2015';
+  if (date('m', $time) >= 10) {
+    $_GET['date_to'] = '30-09-'.(date('Y', $time));
+  } else {
+    $_GET['date_to'] = '30-09-'.(date('Y', $time)-1);
+  }
 }
 
 $report_types = array (
