@@ -5,6 +5,8 @@ require_once '../src/includes.php';
 // Connect to database, or create it if it doesn't exist
 $db = new PDO('sqlite:'.SQLLITE_DB_FILENAME);
 
+// $_GET['output_type'] = 'percentage';
+
 // Default date ranges
 
 $time = time();
@@ -31,6 +33,10 @@ $report_types = array (
   'commits_by_author' => 'By Author'
 );
 
+$output_types = array (
+  'absolute' => 'Absolute Values',
+  'percentage' => 'Percentage'
+);
 
 // Get Author Info
 
@@ -42,7 +48,7 @@ if (!$query) {
 }
 
 while ($row = $stmt->fetch()) {
-	$authors[$row['id']]['row'] = $row;
+	$authors[$row['id']] = $row;
 }
 
 // Get Repo Info
@@ -78,8 +84,10 @@ if (isset($_GET['report_type'])) {
   	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['deletions'] = $row ['deletions'];
   	$commits_map [$row['author_id']] [$row['repo_id']] [$row['week']] ['commits'] = $row ['commits'];
   	
-  	$commits_author_repo [$row['author_id']] [$row['repo_id']] ['total_commits'] += $row ['commits'];
   	$weeks[$row['week']] = $row['week'];
+  	
+  	$commits_author_repo [$row['author_id']] [$row['repo_id']] ['total_commits'] += $row ['commits'];
+  	$repos[$row['repo_id']]['total_commits'] += $row ['commits'];
   	$authors[$row['author_id']]['total_commits'] += $row ['commits'];
   }
   
@@ -87,14 +95,24 @@ if (isset($_GET['report_type'])) {
   
   foreach ($authors AS $author_id => $author) {
     if ($author['total_commits'] > 0) {
-      $total_commits[$author_id] = $author['total_commits'];
+      $author_commits[$author_id] = $author['total_commits'];
     } else {
       // Remove authors without any commits
       unset($authors[$author_id]);
     }
   }
   
-  arsort($total_commits);
+  foreach ($repos AS $repo_id => $repo) {
+    if ($repo['total_commits'] > 0) {
+      $repo_commits[$repo_id] = $repo['total_commits'];
+    } else {
+      // Remove repos without any commits
+      unset($repos[$repo_id]);
+    }
+  }
+  
+  arsort($author_commits);
+  arsort($repo_commits);
   
 }
 
@@ -144,7 +162,7 @@ echo '</pre>';
     <script type="text/javascript" src="/components/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
     
     <style type='text/css'>
-        .container { margin-left: 10px; }
+        .container { margin-left: 10px; font-size:10pt}
     </style>
     
   </head>
@@ -194,8 +212,17 @@ echo '</pre>';
                   </select>
 				        </div>
 			        </div>
+              <div class="form-group">
+				        <div class='input-group' id='reporttypedropdown'>
+                  <select class="form-control" name="output_type">
+                    <? foreach ($output_types AS $output_key => $output_name) { ?> 
+                      <option value="<?= $output_key; ?>"<? echo ( isset($_GET['output_type']) && $_GET['output_type'] == $output_key ? ' selected' : ''); ?>><?= $output_name; ?></option>
+                    <? } ?>
+                  </select>
+				        </div>
+			        </div>
 			    </div>
-			   <div class='col-md-3'>
+          <div class='col-md-3'>
 			        <div class="form-group">
 				        <div class='input-group' id='datebutton'>
                   <button type="submit" class="btn btn-default" name="button" value="commits_by_week">Submit</button>
@@ -250,12 +277,13 @@ echo '</pre>';
   					if (isset($commits_map[$author_id][$repo_id])) { 				
   						echo "\n";
   						echo "        <tr>\n";
-  						echo "          <td>".$author['row']['login'] ."</td>\n";
+  						echo "          <td>".$author['login'] ."</td>\n";
   						echo "          <td>".$repo['name'] ."</td>\n";			
               foreach ($weeks AS $week_id => $week) {
                 if (isset($commits_map[$author_id][$repo_id][$week_id])) {
                   
-                  echo "          <td>".$commits_map[$author_id][$repo_id][$week_id]['commits']."</td>\n";
+                  // echo "          <td>".$commits_map[$author_id][$repo_id][$week_id]['commits']."</td>\n";
+                  echo "          <td>".display_commits($_GET['output_type'], $commits_map[$author_id][$repo_id][$week_id]['commits'], $authors[$author_id]['total_commits'])."</td>\n";
   							} else {
     							echo "          <td>&nbsp;</td>\n";
   							}
@@ -281,10 +309,10 @@ echo '</pre>';
             </thead>
             <tbody>
             <? $i=0; ?>
-            <? foreach ($total_commits AS $author_id => $num_commits) { $i++; ?>
+            <? foreach ($author_commits AS $author_id => $num_commits) { $i++; ?>
               <tr>
                 <td><?= $i?></td>
-                <td><?= $authors[$author_id]['row']['login']?></td>
+                <td><?= $authors[$author_id]['login']?></td>
                 <td><?= $num_commits?></td>
               </tr>
             <? } ?>
@@ -306,21 +334,23 @@ echo '</pre>';
                 
              	</tr>
              	  <th>&nbsp;</th><?
-                foreach ($repos AS $repo_id => $repo) {
+                foreach ($repo_commits AS $repo_id => $num_commits) {
                   $i++;
-                  echo "          <th>".$repo['name']."</th>\n";
+                  echo "          <th>".$repos[$repo_id]['name']."</th>\n";
                 }
               ?>
+                <th>TOTALS</th>
               </tr>
             </thead>
             <tbody>
             <? $i=0; ?>
             <? foreach ($authors AS $author_id => $author) { ?>
               <tr>
-              <td><?= $authors[$author_id]['row']['login']?></td>
-              <?  foreach ($repos AS $repo_id => $repo) { ?>
-                <td><?= $commits_author_repo[$author_id][$repo_id]['total_commits'] ?></td>
-              <?  } ?> 
+              <td><?= $authors[$author_id]['login']?></td>
+              <?  foreach ($repo_commits AS $repo_id => $num_commits) { ?>
+                <td><?= display_commits($_GET['output_type'], $commits_author_repo[$author_id][$repo_id]['total_commits'], $authors[$author_id]['total_commits']); ?></td>
+              <?  } ?>
+                <td><?= $authors[$author_id]['total_commits'] ?></td>
               </tr>
             <? } ?>
             </tbody>
