@@ -344,7 +344,7 @@ echo '</pre>';
             </thead>
             <tbody>
             <? $i=0; ?>
-            <? foreach ($authors AS $author_id => $author) { ?>
+            <? foreach ($author_commits AS $author_id => $num_commits) { ?>
               <tr>
               <td><?= $authors[$author_id]['login']?></td>
               <?  foreach ($repo_commits AS $repo_id => $num_commits) { ?>
